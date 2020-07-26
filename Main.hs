@@ -1,6 +1,7 @@
 module Main where
 
 import Log
+import Data.List
 
 main :: IO ()
 main = putStrLn "Hello, Haskell!"
@@ -42,3 +43,12 @@ hanoi 1 a b _ = [(a, b)]
 hanoi n a b c = hanoi (n - 1) a c b
             ++ hanoi 1 a b c
             ++ hanoi (n - 1) c b a
+
+-- e2 
+
+parseMessage :: String -> LogMessage
+parseMessage s = case words s of
+    "I" : timeStamp : rest -> LogMessage Info (read timeStamp) (unwords rest)
+    "W" : timeStamp : rest -> LogMessage Warning (read timeStamp) (unwords rest)
+    "E" : ecode : timeStamp : rest -> LogMessage (Error (read ecode)) (read timeStamp) (unwords rest)
+    _ -> Unknown s

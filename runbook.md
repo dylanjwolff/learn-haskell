@@ -10,3 +10,6 @@ To build the executable with Nix/the nix package itself:
 ```
 nix-build -A learn-haskell.components.exes
 ```
+
+## NOTE: Haskell.nix is heavily reliant on Git!!! If files are not checked in, the build **will** fail
+(GitClean deletes files not checked in)
