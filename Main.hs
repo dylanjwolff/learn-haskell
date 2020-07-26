@@ -1,7 +1,6 @@
 module Main where
 
 import Log
-import Data.List
 
 main :: IO ()
 main = putStrLn "Hello, Haskell!"
@@ -52,3 +51,28 @@ parseMessage s = case words s of
     "W" : timeStamp : rest -> LogMessage Warning (read timeStamp) (unwords rest)
     "E" : ecode : timeStamp : rest -> LogMessage (Error (read ecode)) (read timeStamp) (unwords rest)
     _ -> Unknown s
+
+parse :: String -> [LogMessage]
+parse s = map parseMessage (lines s)
+
+insert :: LogMessage -> MessageTree -> MessageTree
+insert (Unknown _) mt = mt
+insert m Leaf = Node Leaf m Leaf
+insert m@(LogMessage _ ts _) (Node mtl m'@(LogMessage _ ts' _) mtr) = if ts < ts' 
+    then Node (insert m mtl) m' mtr
+    else Node mtl m' (insert m mtr)
+
+build :: [LogMessage] -> MessageTree
+build [] = Leaf
+build (m:ms) = insert m (build ms)
+
+inOrder :: MessageTree -> [LogMessage]
+inOrder Leaf = []
+inOrder (Node mtl m mtr) = (inOrder mtl) ++ m:(inOrder mtr)
+
+whatWentWrong :: [LogMessage] -> [String]
+whatWentWrong ms = map (\(LogMessage _ _ s) -> s) $ filter severeFilter $ inOrder $ build ms
+
+severeFilter :: LogMessage -> Bool
+severeFilter (LogMessage (Error ecode) _ _) = if ecode >= 50 then True else False 
+severeFilter _ = False
