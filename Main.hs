@@ -1,6 +1,7 @@
 module Main where
 
 import Log
+import qualified Data.Set as Set
 
 main :: IO ()
 main = putStrLn "Hello, Haskell!"
@@ -92,3 +93,37 @@ localMaxima (a:b:c:rest) = if a < b && c < b
 localMaxima _ = []
 
 -- e3.3 is a bit tedious, so skipping
+-- e4
+
+fun1 :: [Integer] -> Integer
+fun1 = foldl (\acc -> \x -> (x-2) * acc) 1 . filter even
+
+-- e4.1.b is a bit silly, the point being (I think) to use iterate and takeWhile... skipping
+
+data Trees a = Leafs
+        | Nodes Integer (Trees a) a (Trees a)
+        deriving (Show, Eq)
+
+balancedInsert :: a -> Trees a -> Trees a
+balancedInsert c Leafs = Nodes 0 Leafs c Leafs
+balancedInsert c (Nodes h Leafs v Leafs) = Nodes (h+1) (Nodes h Leafs c Leafs) v Leafs 
+balancedInsert c (Nodes h Leafs v tr) = Nodes h (Nodes (h+1) Leafs c Leafs) v tr
+balancedInsert c (Nodes h tl v Leafs) = Nodes h tl v (Nodes (h+1) Leafs c Leafs)
+balancedInsert c (Nodes h tl@(Nodes tlh _ _ _) v tr@(Nodes trh _ _ _)) = if tlh < trh
+    then Nodes h (balancedInsert c tl) v tr
+    else Nodes h tl v (balancedInsert c tr)
+-- this is a bit tedious to get the heights correct... skipping (also fold is trivial from there)
+
+xor :: [Bool] -> Bool
+xor = odd . foldl (\numtrue -> \c -> if c then numtrue + 1 else numtrue) 0
+
+-- e4.3.2 is silly, skipping
+
+cartProd :: [a] -> [b] -> [(a, b)]
+cartProd xs ys = [(x,y) | x <- xs, y <- ys]
+
+getBads :: Integer -> Set.Set Integer
+getBads n = Set.fromList $ filter (\x -> x <= n) $ map (\(i, j) -> i + j + 2*i*j) $ [1..n `div` 2] >>= (\x -> zip [1..x] (cycle [x]))
+
+sieveSundaram :: Integer -> [Integer]
+sieveSundaram i = Set.elems $ Set.map (\x -> 2*x + 1)  $ Set.fromList [1..i] Set.\\ (getBads i) 
