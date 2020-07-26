@@ -25,4 +25,10 @@ toDigitsRec i = let car = i `mod` 10 in
 
 doubleEveryOther :: [Integer] -> [Integer]
 doubleEveryOther vec = let fr = \c -> \(even, acc) -> if even then (not even, (2*c):acc) else (not even, c:acc) in
-                        snd $ foldr fr (True, []) vec
+                        snd $ foldr fr (False, []) vec
+
+sumDigits :: [Integer] -> Integer
+sumDigits digs = sum $ digs >>= toDigits
+
+validate :: Integer -> Bool
+validate x = (== 0) $ flip mod 10 $ sumDigits $ doubleEveryOther $ toDigits x
