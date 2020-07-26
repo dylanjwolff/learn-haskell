@@ -23,4 +23,6 @@ toDigitsRec i = let car = i `mod` 10 in
              let dividend = i `div` 10 in
              (toDigitsRec dividend) ++ [car]
 
-
+doubleEveryOther :: [Integer] -> [Integer]
+doubleEveryOther vec = let fr = \c -> \(even, acc) -> if even then (not even, (2*c):acc) else (not even, c:acc) in
+                        snd $ foldr fr (True, []) vec
