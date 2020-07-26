@@ -76,3 +76,19 @@ whatWentWrong ms = map (\(LogMessage _ _ s) -> s) $ filter severeFilter $ inOrde
 severeFilter :: LogMessage -> Bool
 severeFilter (LogMessage (Error ecode) _ _) = if ecode >= 50 then True else False 
 severeFilter _ = False
+
+--e3
+everyNth :: Int -> [a] -> [a]
+everyNth _ [] = []
+everyNth n (c:car) = c:(everyNth n $ drop (n-1) car)
+
+skips :: [a] -> [[a]]
+skips l = map (\n -> everyNth n l) [1..length l]
+
+localMaxima :: [Integer] -> [Integer]
+localMaxima (a:b:c:rest) = if a < b && c < b 
+    then b:(localMaxima (c:rest))
+    else localMaxima (c:rest)
+localMaxima _ = []
+
+-- e3.3 is a bit tedious, so skipping
